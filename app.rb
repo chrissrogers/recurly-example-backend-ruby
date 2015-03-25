@@ -17,7 +17,7 @@ enable :logging
 post '/subscriptions/new' do
   begin
     Recurly::Subscription.create!({
-      plan_code: ENV['RECURLY_PLAN_CODES'],
+      plan_code: params['recurly-plan-code'],
       account: {
         account_code: SecureRandom.uuid,
         billing_info: { token_id: params['recurly-token'] }
@@ -55,12 +55,17 @@ put '/accounts/:account_code' do
   end
 end
 
-get '/' do
-  send_file File.join(settings.public_folder, 'index.html')
+get '/config.js' do
+  content_type :js
+  "window.recurlyConfig = { publicKey: '#{ENV['RECURLY_PUBLIC_KEY']}' }"
 end
 
-get '/config.js' do
-  "window.recurlyPublicKey = '#{ENV['RECURLY_PUBLIC_KEY']}'"
+get '/fs' do
+  Dir["./public/*"].join "\n"
+end
+
+get '*' do
+  send_file File.join(settings.public_folder, 'index.html')
 end
 
 def error e

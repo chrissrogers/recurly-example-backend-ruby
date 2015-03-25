@@ -8,10 +8,6 @@
       "description": "The subdomain of your Recurly site",
       "required": true
     },
-    "RECURLY_PLAN_CODE": {
-      "description": "The plan code to which new subscriptions will subscribe",
-      "required": true
-    },
     "RECURLY_PRIVATE_KEY": {
       "description": "The PRIVATE key from at https://app.recurly.com/go/developer/api_access",
       "required": true
@@ -20,5 +16,8 @@
       "description": "The PUBLIC key from https://app.recurly.com/go/developer/api_access",
       "required": true
     }
+  },
+  "scripts": {
+    "postdeploy": "curl -L https://github.com/chrissrogers/recurly-example-frontend/archive/master.tar.gz | tar xvz; mkdir -p public; mv recurly-example-frontend-master/* public/"
   }
 }

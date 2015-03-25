@@ -10,17 +10,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <section>
-      <figure class="logo">
-        <span class="price">$10</span>
-        <span class="term">monthly</span>
-      </figure>
-    </section>
+    <form method="post" action="/api/subscriptions/new">
+      <section>
+        <figure class="logo">
+          <span class="price">$10</span>
+          <span class="term">monthly</span>
+        </figure>
+      </section>
 
-    <section id="errors"></section>
+      <section id="errors"></section>
 
-    <section>
-      <form method="post" action="/api/subscriptions/new">
+      <section>
         <div>
           <label for="number">Card Number</label>
           <input type="text" data-recurly="number" id="number">
@@ -53,54 +53,66 @@
 
         <button id="subscribe">Subscribe</button>
 
+        <input type="hidden" data-recurly="currency" value="USD">
+        <input type="hidden" data-recurly="plan" name="recurly-plan-code" id="recurly-plan-code">
         <input type="hidden" data-recurly="token" name="recurly-token">
-      </form>
-    </section>
+      </section>
+    </form>
     <script>
-      // Configure recurly.js
-      // set window.recurlyPublicKey to your own public key from
-      recurly.configure(window.recurlyPublicKey);
+      (function () {
+        // Configure recurly.js
+        // set window.recurlyConfig to your own public key
+        recurly.configure(window.recurlyConfig);
 
-      // On form submit, we stop submission to go get the token
-      $('form').on('submit', function (event) {
+        plan();
 
-        // Prevent the form from submitting while we retrieve the token from Recurly
-        event.preventDefault();
+        // On form submit, we stop submission to go get the token
+        $('form').on('submit', function (event) {
 
-        // Reset the errors display
-        $('#errors').text('');
-        $('input').removeClass('error');
+          // Prevent the form from submitting while we retrieve the token from Recurly
+          event.preventDefault();
 
-        // Disable the submit button
-        $('button').prop('disabled', true);
+          // Reset the errors display
+          $('#errors').text('');
+          $('input').removeClass('error');
 
-        var form = this;
+          // Disable the submit button
+          $('button').prop('disabled', true);
 
-        // Now we call recurly.token with the form. It goes to Recurly servers
-        // to tokenize the credit card information, then injects the token into the
-        // data-recurly="token" field above
-        recurly.token(form, function (err, token) {
+          var form = this;
 
-          // send any errors to the error function below
-          if (err) error(err);
+          // Now we call recurly.token with the form. It goes to Recurly servers
+          // to tokenize the credit card information, then injects the token into the
+          // data-recurly="token" field above
+          recurly.token(form, function (err, token) {
 
-          // Otherwise we continue with the form submission
-          else form.submit();
+            // send any errors to the error function below
+            if (err) error(err);
 
+            // Otherwise we continue with the form submission
+            else form.submit();
+
+          });
         });
-      });
 
-      // A simple error handling function to expose errors to the customer
-      function error (err) {
-        $('#errors').text('The following fields appear to be invalid: ' + err.fields.join(', '));
-        $('button').prop('disabled', false);
-        $.each(err.fields, function (i, field) {
-          $('[data-recurly=' + field + ']').addClass('error');
-        });
-      }
+        function plan () {
+          var route = window.location.pathname.split('/');
+          var planCode = route[route.length - 1];
+          $('#recurly-plan-code').val(planCode);
+        }
 
-      // runs some simple animations for the page
-      $('body').addClass('show');
+        // A simple error handling function to expose errors to the customer
+        function error (err) {
+          $('#errors').text('The following fields appear to be invalid: ' + err.fields.join(', '));
+          $('button').prop('disabled', false);
+          $.each(err.fields, function (i, field) {
+            $('[data-recurly=' + field + ']').addClass('error');
+          });
+        }
+
+        // runs some simple animations for the page
+        $('body').addClass('show');
+      })();
     </script>
   </body>
 </html>
