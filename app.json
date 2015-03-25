@@ -1,0 +1,24 @@
+{
+  "name": "Recurly Ruby Example",
+  "description": "For quickly getting started with a Recurly integration.",
+  "repository": "https://github.com/chrissrogers/recurly-example-integration-ruby",
+  "keywords": ["recurly", "ruby", "payments", "subscriptions"],
+  "env": {
+    "RECURLY_SUBDOMAIN": {
+      "description": "The subdomain of your Recurly site",
+      "required": true
+    },
+    "RECURLY_PLAN_CODE": {
+      "description": "The plan code to which new subscriptions will subscribe",
+      "required": true
+    },
+    "RECURLY_PRIVATE_KEY": {
+      "description": "The PRIVATE key from at https://app.recurly.com/go/developer/api_access",
+      "required": true
+    },
+    "RECURLY_PUBLIC_KEY": {
+      "description": "The PUBLIC key from https://app.recurly.com/go/developer/api_access",
+      "required": true
+    }
+  }
+}
