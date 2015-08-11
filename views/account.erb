@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recurly.js Example: Change a Subscription</title>
+    <script src="https://js.recurly.com/v3/recurly.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="/config.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link href="/index.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <form method="post" action="/api/subscription">
+      <section>
+        <figure class="logo">
+          <span class="term">My Account</span>
+        </figure>
+      </section>
+
+      <section>
+        <div class="select">
+          <label for="subscriptions">Your subscriptions</label>
+          <select name="subscription" id="subscriptions">
+            <% @account.subscriptions.find_each do |subscription| %>
+              <option value="<%= subscription.uuid %>" data-plan="<%= subscription.plan_code %>">Subscription to <%= subscription.plan_code %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="select">
+          <label for="plans">Change plan</label>
+          <select name="plan" data-recurly="plan" id="plans"></select>
+        </div>
+
+        <br>
+
+        <button id="change">Change</button>
+
+        <input type="hidden" name="recurly-account-code" id="recurly-account-code">
+        <input type="hidden" data-recurly="currency" value="USD">
+        <input type="hidden" data-recurly="token" name="recurly-token">
+      </section>
+    </form>
+    <script>
+      (function () {
+        subscriptions();
+
+        function subscriptions () {
+          var subscriptionSelect = $('#subscriptions');
+
+          subscriptionSelect.on('change', plans);
+          plans.apply(subscriptionSelect);
+        }
+
+        function plans () {
+          var planSelect = $('#plans');
+          var plans = <%= JSON.generate(@plans) %>;
+          var subscriptionPlanCode = $(this).find(':selected').data('plan');
+
+          planSelect.html(plans.map(function (plan) {
+            var selected = plan.code === subscriptionPlanCode ? 'selected' : '';
+            return '<option value="' + plan.code + '" ' + selected + '>' + plan.name + '</option>';
+          }));
+        }
+
+        // runs some simple animations for the page
+        $('body').addClass('show');
+      })();
+    </script>
+  </body>
+</html>

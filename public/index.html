@@ -4,9 +4,9 @@
     <title>Recurly.js Example: Minimal Billing Information</title>
     <script src="https://js.recurly.com/v3/recurly.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="config.js"></script>
+    <script src="/config.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link href="index.css" rel="stylesheet">
+    <link href="/index.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
@@ -53,6 +53,7 @@
 
         <button id="subscribe">Subscribe</button>
 
+        <input type="hidden" data-recurly="country" value="US">
         <input type="hidden" data-recurly="currency" value="USD">
         <input type="hidden" data-recurly="plan" name="recurly-plan-code" id="recurly-plan-code">
         <input type="hidden" data-recurly="token" name="recurly-token">

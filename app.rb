@@ -2,6 +2,7 @@ require 'securerandom'
 require 'sinatra'
 require 'recurly'
 require 'dotenv'
+require 'json'
 
 Dotenv.load
 
@@ -14,23 +15,36 @@ set :public_folder, 'public'
 enable :static
 enable :logging
 
-post '/subscriptions/new' do
+# New subscription
+post '/api/subscriptions/new' do
   begin
+    account_code = SecureRandom.uuid
     Recurly::Subscription.create!({
       plan_code: params['recurly-plan-code'],
       account: {
-        account_code: SecureRandom.uuid,
+        account_code: account_code,
         billing_info: { token_id: params['recurly-token'] }
       }
     })
-
-    "Subscription created"
+    redirect "/account/#{account_code}"
   rescue Recurly::Resource::Invalid, Recurly::API::ResponseError => e
     error(e)
   end
 end
 
-post '/accounts/new' do
+# Update subscription
+post '/api/subscription' do
+  begin
+    subscription = Recurly::Subscription.find params['subscription']
+    subscription.update_attributes! plan_code: params['plan']
+    redirect "/account/#{subscription.account.account_code}"
+  rescue Recurly::Resource::Invalid, Recurly::API::ResponseError => e
+    error(e)
+  end
+end
+
+# New account
+post '/api/accounts/new' do
   begin
     Recurly::Account.create!({
       account_code: SecureRandom.uuid,
@@ -43,7 +57,8 @@ post '/accounts/new' do
   end
 end
 
-put '/accounts/:account_code' do
+# Update account
+put '/api/accounts/:account_code' do
   begin
     account = Recurly::Account.find params[:account_code]
     account.billing_info.token_id = params['recurly-token']
@@ -55,19 +70,29 @@ put '/accounts/:account_code' do
   end
 end
 
+# Account management
+get '/account/:code' do
+  begin
+    @account = Recurly::Account.find params['code']
+    @plans = Recurly::Plan.all.map{|plan| {code: plan.plan_code, name: plan.name} }
+    erb :account
+  rescue Recurly::Resource::NotFound => e
+    error(e)
+  end
+end
+
+# Config conduit
 get '/config.js' do
   content_type :js
   "window.recurlyConfig = { publicKey: '#{ENV['RECURLY_PUBLIC_KEY']}' }"
 end
 
-get '/fs' do
-  Dir["./public/*"].join "\n"
-end
-
+# Subscribe form
 get '*' do
   send_file File.join(settings.public_folder, 'index.html')
 end
 
+# Generic error handling
 def error e
   logger.error e
   status 402

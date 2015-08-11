@@ -46,7 +46,7 @@ label {
   clear: left;
 }
 
-input {
+input, select {
   position: relative;
   width: 100%;
   border: 2px solid #c2c2c2;
@@ -59,7 +59,7 @@ input {
   font-weight: bold;
   box-shadow: none;
   border-radius: 0;
-  color: #c2c2c2;
+  color: #a2a2a2;
   -webkit-appearance: none;
   -webkit-transition: border-color 0.3s;
   -moz-transition: border-color 0.3s;
@@ -76,6 +76,22 @@ input:focus {
 
 input.error {
   border-color: #e43c29;
+}
+
+div.select {
+  position: relative;
+}
+
+div.select::after {
+  content: '▼';
+  position: absolute;
+  right: 10px;
+  bottom: 25px;
+  color: #a2a2a2;
+}
+
+div.select select {
+  padding-right: 30px;
 }
 
 div.date {
